@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Transaction {{ ref }} — Signal Room</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dot"></span> Signal Room</div>
+  <nav class="topnav">
+    <a href="/">Dashboard</a>
+    <a href="/upload">Load data</a>
+  </nav>
+</header>
+
+<div class="container narrow">
+  <span class="section-label">Transaction detail</span>
+  <h2 class="mono" id="txnTitle">{{ ref }}</h2>
+  <p><a href="/">← Back to dashboard</a></p>
+
+  <div id="content"></div>
+</div>
+
+<script>
+async function load() {
+  const content = document.getElementById('content');
+  try {
+    const res = await fetch(`/api/transactions/{{ ref }}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Not found');
+    const t = data.transaction;
+
+    content.innerHTML = `
+      <div class="panel">
+        <div class="panel-head">
+          <span class="section-label">Risk assessment</span>
+          <span class="risk-badge ${t.risk_level.toLowerCase()}">${t.risk_level} risk</span>
+        </div>
+        <div class="detail-row"><span class="k">Final risk score</span><span class="v">${t.final_risk_score} / 100</span></div>
+        <div class="risk-bar-track" style="margin:0.4em 0 1em;">
+          <div class="risk-bar-fill ${t.risk_level.toLowerCase()}" style="width:${t.final_risk_score}%;"></div>
+        </div>
+        <div class="detail-row"><span class="k">Rule-based score</span><span class="v">${t.rule_score} / 100</span></div>
+        <div class="detail-row"><span class="k">ML anomaly score (Isolation Forest)</span><span class="v">${t.ml_anomaly_score} / 100</span></div>
+      </div>
+
+      <div class="panel">
+        <span class="section-label">Triggered rule flags</span>
+        <div style="margin-top:0.8em;">
+          ${t.rule_flags.length ? t.rule_flags.map(f => `<span class="flag-chip">${f}</span>`).join('') : '<span class="muted">No rule flags triggered.</span>'}
+        </div>
+      </div>
+
+      <div class="panel">
+        <span class="section-label">Transaction details</span>
+        <div class="detail-row"><span class="k">Customer</span><span class="v">${t.customer_id}</span></div>
+        <div class="detail-row"><span class="k">Timestamp</span><span class="v">${t.timestamp}</span></div>
+        <div class="detail-row"><span class="k">Amount</span><span class="v">$${Number(t.amount).toFixed(2)}</span></div>
+        <div class="detail-row"><span class="k">Merchant category</span><span class="v">${t.merchant_category}</span></div>
+        <div class="detail-row"><span class="k">Card present</span><span class="v">${t.card_present ? 'Yes' : 'No'}</span></div>
+        <div class="detail-row"><span class="k">Distance from home</span><span class="v">${t.distance_from_home_km} km</span></div>
+        <div class="detail-row"><span class="k">Hour of day</span><span class="v">${t.txn_hour}:00</span></div>
+        <div class="detail-row"><span class="k">Velocity (last hour)</span><span class="v">${t.velocity_last_hour} txns</span></div>
+        <div class="detail-row"><span class="k">New merchant category?</span><span class="v">${t.is_new_merchant_category ? 'Yes' : 'No'}</span></div>
+      </div>
+    `;
+  } catch (err) {
+    content.innerHTML = `<div class="form-msg error">${err.message}</div>`;
+  }
+}
+load();
+</script>
+</body>
+</html>

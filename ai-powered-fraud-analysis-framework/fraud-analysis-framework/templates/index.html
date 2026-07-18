@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Room — Fraud Analysis Framework</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dot"></span> Signal Room</div>
+  <nav class="topnav">
+    <a href="/" class="active">Dashboard</a>
+    <a href="/upload">Load data</a>
+  </nav>
+</header>
+
+<div class="container">
+  <span class="section-label">Fraud analysis overview</span>
+  <h2>Transaction risk dashboard</h2>
+  <p class="muted">Every transaction is scored by two independent signals — a transparent rule engine and an unsupervised Isolation Forest anomaly model — then blended into one risk score.</p>
+
+  <div class="signal-strip" id="statsStrip"></div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <span class="section-label">Transaction ledger</span>
+      <div style="display:flex; gap:0.6em;">
+        <button class="secondary" onclick="rescoreAll()" id="rescoreBtn">Rescore all</button>
+        <a href="/upload" class="btn" style="text-decoration:none;">Load new data</a>
+      </div>
+    </div>
+
+    <div class="filter-bar">
+      <span class="chip-filter active" data-level="all">All</span>
+      <span class="chip-filter" data-level="High">High risk</span>
+      <span class="chip-filter" data-level="Medium">Medium risk</span>
+      <span class="chip-filter" data-level="Low">Low risk</span>
+    </div>
+
+    <div id="tableWrap"></div>
+  </div>
+</div>
+
+<p class="footer-note">Signal Room — an AI-powered fraud analysis framework. Rule engine + Isolation Forest anomaly detection, blended 50/50.</p>
+
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

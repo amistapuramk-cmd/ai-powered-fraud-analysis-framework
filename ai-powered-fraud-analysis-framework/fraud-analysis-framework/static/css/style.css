@@ -1,0 +1,284 @@
+/* ==========================================================================
+   AI-Powered Fraud Analysis Framework — "Signal Room" design system
+   Concept: a dark analyst console, like a security operations center (SOC)
+   monitor wall — data-dense, glanceable risk signal, minimal chrome.
+========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #0B0F14;
+  --panel: #121821;
+  --panel-alt: #171F2B;
+  --border: #232D3B;
+  --text: #E7ECF2;
+  --text-muted: #8493A6;
+  --accent-amber: #E8A33D;   /* medium risk / attention */
+  --accent-red: #E5484D;     /* high risk / alert */
+  --accent-green: #3DDC97;   /* low risk / clear */
+  --accent-blue: #4FA3F7;    /* informational / ML signal */
+  --radius: 6px;
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  margin: 0 0 0.4em;
+  letter-spacing: -0.01em;
+}
+
+a { color: var(--accent-blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+p { margin: 0 0 1em; color: var(--text); }
+.muted { color: var(--text-muted); }
+code, .mono { font-family: var(--font-mono); }
+
+/* ---------------- Header ---------------- */
+.topbar {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.brand .dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+  display: inline-block;
+}
+.topnav { display: flex; gap: 1.6rem; align-items: center; font-size: 0.9rem; }
+.topnav a { color: var(--text-muted); }
+.topnav a.active, .topnav a:hover { color: var(--text); text-decoration: none; }
+
+/* ---------------- Layout ---------------- */
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.container.narrow { max-width: 640px; }
+
+/* ---------------- Signal meter (signature element) ---------------- */
+.signal-strip {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+.signal-cell {
+  background: var(--panel);
+  padding: 1.3rem 1.2rem;
+}
+.signal-cell .label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-muted);
+  margin-bottom: 0.5em;
+}
+.signal-cell .value {
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+.signal-cell.high .value { color: var(--accent-red); }
+.signal-cell.medium .value { color: var(--accent-amber); }
+.signal-cell.low .value { color: var(--accent-green); }
+.signal-cell.info .value { color: var(--accent-blue); }
+
+/* ---------------- Panels ---------------- */
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.6rem;
+  margin-bottom: 1.6rem;
+}
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.section-label {
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.72rem;
+  color: var(--accent-blue);
+}
+
+/* ---------------- Buttons / inputs ---------------- */
+button, .btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.88rem;
+  background: var(--accent-blue);
+  color: #06121F;
+  border: none;
+  padding: 0.65em 1.3em;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+button:hover { opacity: 0.88; }
+button:active { transform: translateY(1px); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+button.secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+button.secondary:hover { background: var(--panel-alt); opacity: 1; }
+button:focus-visible { outline: 2px solid var(--accent-blue); outline-offset: 2px; }
+
+input, select {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.6em 0.8em;
+  border-radius: var(--radius);
+  width: 100%;
+}
+label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35em;
+  margin-top: 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+label:first-child { margin-top: 0; }
+
+/* ---------------- Table (transaction ledger) ---------------- */
+table.grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+table.grid th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  padding: 0.7em 0.8em;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 60px;
+  background: var(--panel);
+}
+table.grid td {
+  padding: 0.75em 0.8em;
+  border-bottom: 1px solid var(--border);
+}
+table.grid tr:hover td { background: var(--panel-alt); }
+table.grid td.mono { font-family: var(--font-mono); }
+
+/* ---------------- Risk badges + bar ---------------- */
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.3em 0.65em;
+  border-radius: 999px;
+  font-weight: 600;
+}
+.risk-badge::before { content: "●"; font-size: 0.55em; }
+.risk-badge.high { color: var(--accent-red); background: rgba(229,72,77,0.12); }
+.risk-badge.medium { color: var(--accent-amber); background: rgba(232,163,61,0.12); }
+.risk-badge.low { color: var(--accent-green); background: rgba(61,220,151,0.12); }
+
+.risk-bar-track {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.risk-bar-fill { height: 100%; border-radius: 3px; }
+.risk-bar-fill.high { background: var(--accent-red); }
+.risk-bar-fill.medium { background: var(--accent-amber); }
+.risk-bar-fill.low { background: var(--accent-green); }
+
+/* ---------------- Flag chips (rule explanations) ---------------- */
+.flag-chip {
+  display: inline-block;
+  font-size: 0.78rem;
+  padding: 0.4em 0.8em;
+  border-radius: var(--radius);
+  background: var(--panel-alt);
+  border: 1px solid var(--border);
+  margin: 0.2em 0.3em 0.2em 0;
+  color: var(--text);
+}
+.flag-chip::before { content: "⚑ "; color: var(--accent-amber); }
+
+/* ---------------- Filters ---------------- */
+.filter-bar { display: flex; gap: 0.7em; margin-bottom: 1.2rem; flex-wrap: wrap; align-items: center; }
+.filter-bar select, .filter-bar input { width: auto; min-width: 140px; }
+.chip-filter {
+  padding: 0.5em 1em;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 0.82rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  background: transparent;
+}
+.chip-filter.active { color: var(--bg); background: var(--text); border-color: var(--text); }
+
+/* ---------------- Misc ---------------- */
+.empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+.empty-state .glyph { font-size: 1.8rem; margin-bottom: 0.5em; }
+.form-msg { font-size: 0.85rem; padding: 0.7em 1em; border-radius: var(--radius); margin-top: 1em; display: none; }
+.form-msg.error { display: block; background: rgba(229,72,77,0.1); color: var(--accent-red); }
+.form-msg.success { display: block; background: rgba(61,220,151,0.1); color: var(--accent-green); }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.detail-row { display: flex; justify-content: space-between; padding: 0.6em 0; border-bottom: 1px dashed var(--border); font-size: 0.9rem; }
+.detail-row:last-child { border-bottom: none; }
+.detail-row .k { color: var(--text-muted); }
+.detail-row .v { font-family: var(--font-mono); }
+.footer-note { text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 2rem; }
+
+@media (max-width: 900px) {
+  .signal-strip { grid-template-columns: repeat(2, 1fr); }
+  .grid-2 { grid-template-columns: 1fr; }
+}

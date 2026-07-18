@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Load data — Signal Room</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand"><span class="dot"></span> Signal Room</div>
+  <nav class="topnav">
+    <a href="/">Dashboard</a>
+    <a href="/upload" class="active">Load data</a>
+  </nav>
+</header>
+
+<div class="container narrow">
+  <span class="section-label">Data ingestion</span>
+  <h2>Load transactions to analyze</h2>
+  <p class="muted">Generate a synthetic batch to try the framework immediately, or upload your own CSV of transactions.</p>
+
+  <div class="panel">
+    <div class="panel-head"><span class="section-label">Option A — Generate sample data</span></div>
+    <p class="muted" style="font-size:0.85rem;">Creates realistic synthetic transactions with a configurable ratio of injected fraud-like outliers, then trains the model and scores them immediately.</p>
+    <form id="generateForm">
+      <label for="count">Number of transactions</label>
+      <input type="number" id="count" value="500" min="20" max="5000">
+
+      <label for="fraudRatio">Approx. fraud ratio (0–0.5)</label>
+      <input type="number" id="fraudRatio" value="0.06" min="0" max="0.5" step="0.01">
+
+      <div style="margin-top:1.4em;">
+        <button type="submit" id="genBtn">Generate & analyze</button>
+      </div>
+      <div class="form-msg" id="genMsg"></div>
+    </form>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><span class="section-label">Option B — Upload your own CSV</span></div>
+    <p class="muted" style="font-size:0.85rem;">
+      Required columns: <code class="mono">transaction_ref, customer_id, timestamp, amount, merchant_category, card_present, distance_from_home_km, txn_hour, velocity_last_hour, is_new_merchant_category</code>
+    </p>
+    <p style="font-size:0.85rem;"><a href="/api/sample-csv-template">Download a template CSV →</a></p>
+    <form id="uploadForm">
+      <label for="csvFile">CSV file</label>
+      <input type="file" id="csvFile" accept=".csv" required>
+
+      <label for="uploadContamination">Approx. fraud ratio (for model tuning)</label>
+      <input type="number" id="uploadContamination" value="0.06" min="0" max="0.5" step="0.01">
+
+      <div style="margin-top:1.4em;">
+        <button type="submit" id="uploadBtn">Upload & analyze</button>
+      </div>
+      <div class="form-msg" id="uploadMsg"></div>
+    </form>
+  </div>
+</div>
+
+<p class="footer-note">Loading new data replaces the current transaction set and retrains the anomaly model.</p>
+
+<script>
+document.getElementById('generateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('genBtn');
+  const msg = document.getElementById('genMsg');
+  btn.disabled = true; btn.textContent = 'Analyzing…';
+  msg.className = 'form-msg';
+
+  try {
+    const res = await fetch('/api/transactions/generate-sample', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        count: parseInt(document.getElementById('count').value, 10),
+        fraud_ratio: parseFloat(document.getElementById('fraudRatio').value)
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    msg.className = 'form-msg success';
+    msg.textContent = data.message + ' Redirecting to dashboard…';
+    setTimeout(() => window.location.href = '/', 900);
+  } catch (err) {
+    msg.className = 'form-msg error';
+    msg.textContent = err.message;
+    btn.disabled = false; btn.textContent = 'Generate & analyze';
+  }
+});
+
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('uploadBtn');
+  const msg = document.getElementById('uploadMsg');
+  const fileInput = document.getElementById('csvFile');
+  if (!fileInput.files.length) return;
+
+  btn.disabled = true; btn.textContent = 'Analyzing…';
+  msg.className = 'form-msg';
+
+  const formData = new FormData();
+  formData.append('file', fileInput.files[0]);
+  formData.append('contamination', document.getElementById('uploadContamination').value);
+
+  try {
+    const res = await fetch('/api/transactions/upload', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    msg.className = 'form-msg success';
+    msg.textContent = data.message + ' Redirecting to dashboard…';
+    setTimeout(() => window.location.href = '/', 900);
+  } catch (err) {
+    msg.className = 'form-msg error';
+    msg.textContent = err.message;
+    btn.disabled = false; btn.textContent = 'Upload & analyze';
+  }
+});
+</script>
+</body>
+</html>
